@@ -59,6 +59,7 @@ libero_suites = [
     "libero_goal",
     "libero_90",
     "libero_10",
+    "libero_test",
 ]
 task_maps = {}
 max_len = 0
@@ -116,6 +117,8 @@ class Benchmark(abc.ABC):
         tasks = list(task_maps[self.name].values())
         if self.name == "libero_90":
             self.tasks = tasks
+        elif self.name == "libero_test":
+            self.tasks = tasks
         else:
             print(f"[info] using task orders {task_orders[self.task_order_index]}")
             self.tasks = [tasks[i] for i in task_orders[self.task_order_index]]
@@ -161,7 +164,7 @@ class Benchmark(abc.ABC):
             self.tasks[i].problem_folder,
             self.tasks[i].init_states_file,
         )
-        init_states = torch.load(init_states_path, weights_only=False)
+        init_states = torch.load(init_states_path)#, weights_only=False)
         return init_states
 
     def set_task_embs(self, task_embs):
@@ -210,6 +213,15 @@ class LIBERO_10(Benchmark):
         self.name = "libero_10"
         self._make_benchmark()
 
+@register_benchmark
+class LIBERO_test(Benchmark):
+    def __init__(self, task_order_index=0):
+        super().__init__(task_order_index=task_order_index)
+        assert (
+            task_order_index == 0
+        ), "[error] currently only support task order for 10-task suites"
+        self.name = "libero_test"
+        self._make_benchmark()
 
 @register_benchmark
 class LIBERO_100(Benchmark):

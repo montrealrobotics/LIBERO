@@ -179,8 +179,10 @@ class BDDLBaseDomain(SingleArmEnv):
         reward = 0.0
 
         # sparse completion reward
-        if self._check_success():
-            reward = 1.0
+        # if self._check_success():
+        #     reward = 1.0
+        results = self._check_success()
+        reward = results.count(True) / len(results)
 
         # Scale reward if requested
         if self.reward_scale is not None:
@@ -804,7 +806,8 @@ class BDDLBaseDomain(SingleArmEnv):
             action = np.concatenate((action[:3], action[-1:]), axis=-1)
 
         obs, reward, done, info = super().step(action)
-        done = self._check_success()
+        results = self._check_success()
+        done = results.count(True) == len(results)
 
         return obs, reward, done, info
 

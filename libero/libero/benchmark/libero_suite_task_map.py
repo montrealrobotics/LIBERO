@@ -35,6 +35,18 @@ libero_task_map = {
         "put_the_bowl_on_the_plate",
         "put_the_wine_bottle_on_the_rack",
     ],
+    "libero_test": [
+        "LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_tomato_sauce_in_the_basket",
+        "LIVING_ROOM_SCENE6_put_the_red_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate",
+        "LIVING_ROOM_SCENE2_put_both_the_tomato_sauce_and_the_butter_in_the_basket",
+        "KITCHEN_SCENE5_close_the_top_drawer_of_the_cabinet_and_put_the_black_bowl_on_top_of_it",
+        "KITCHEN_SCENE4_put_the_wine_bottle_in_the_bottom_drawer_of_the_cabinet_and_close_it",
+        "KITCHEN_SCENE2_open_the_bottom_drawer_of_the_cabinet",
+        "KITCHEN_SCENE4_open_the_top_drawer_of_the_cabinet",
+        "KITCHEN_SCENE10_put_the_black_bowl_on_top_of_the_cabinet",
+        "LIVING_ROOM_SCENE2_pick_up_the_cream_cheese_box_and_put_it_in_the_basket",
+        "LIVING_ROOM_SCENE2_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket",
+    ],
     "libero_10": [
         "LIVING_ROOM_SCENE2_put_both_the_alphabet_soup_and_the_tomato_sauce_in_the_basket",
         "LIVING_ROOM_SCENE2_put_both_the_cream_cheese_box_and_the_butter_in_the_basket",

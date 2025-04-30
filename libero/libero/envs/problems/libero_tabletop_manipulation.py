@@ -137,10 +137,12 @@ class Libero_Tabletop_Manipulation(BDDLBaseDomain):
         Check if the goal is achieved. Consider conjunction goals at the moment
         """
         goal_state = self.parsed_problem["goal_state"]
-        result = True
-        for state in goal_state:
-            result = self._eval_predicate(state) and result
-        return result
+        # results = True
+        results = [False] * len(goal_state)
+        for i, state  in enumerate(goal_state):
+            # results = self._eval_predicate(state) and result
+            results[i] = self._eval_predicate(state)
+        return results
 
     def _eval_predicate(self, state):
         if len(state) == 3:

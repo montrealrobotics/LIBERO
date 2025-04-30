@@ -132,16 +132,18 @@ class Libero_Kitchen_Tabletop_Manipulation(BDDLBaseDomain):
     def _add_placement_initializer(self):
         """Very simple implementation at the moment. Will need to upgrade for other relations later."""
         super()._add_placement_initializer()
-
+    
     def _check_success(self):
         """
         Check if the goal is achieved. Consider conjunction goals at the moment
         """
         goal_state = self.parsed_problem["goal_state"]
-        result = True
-        for state in goal_state:
-            result = self._eval_predicate(state) and result
-        return result
+        # results = True
+        results = [False] * len(goal_state)
+        for i, state  in enumerate(goal_state):
+            # results = self._eval_predicate(state) and result
+            results[i] = self._eval_predicate(state)
+        return results
 
     def _eval_predicate(self, state):
         if len(state) == 3:
