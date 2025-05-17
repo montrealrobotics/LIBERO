@@ -87,7 +87,7 @@
   )
 
   (:goal
-    (And (Open white_cabinet_1_bottom_region))
+    (And (Open white_cabinet_1_top_region))
   )
 
 )
