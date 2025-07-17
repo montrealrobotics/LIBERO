@@ -79,7 +79,7 @@ def main(args):
 
     # Prepare JSON file to record success/false and initial states per episode
     metainfo_json_dict = {}
-    metainfo_json_out_path = f"/home/artur/datasets/{args.libero_task_suite}_metainfo.json"
+    metainfo_json_out_path = f"{args.libero_target_dir}/{args.libero_task_suite}_metainfo.json"
     with open(metainfo_json_out_path, "w") as f:
         # Just test that we can write to this file (we overwrite it later)
         json.dump(metainfo_json_dict, f)
