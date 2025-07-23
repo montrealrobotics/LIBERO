@@ -276,3 +276,85 @@ class DemoRenderEnv(ControlEnv):
 
     def _get_observations(self):
         return self.env._get_observations()
+
+
+class DenseRewardEnv(OffScreenRenderEnv):
+    """
+    For dense reward
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.env.reward = self._dense_reward
+    
+    def _dense_reward(self, action=None):
+        reward = 0.0
+
+        for state in self.env.parsed_problem["goal_state"]:
+            result = self.env._eval_predicate(state)
+            if result:
+                reward += 1.0
+                continue
+            gripper = self.env.robots[0].gripper    
+            
+            obj1_name = state[1]
+            obj2_name = state[2] if len(state) == 3 else None
+
+            ## there must be a easier way to do these loops 
+            ## or another solution without loops
+            ## here if the obj1 is a region, it is a site object
+            ## which cannot not have any geoms
+            ## it also means it is most likely a region of another object (most likely a fixture)
+            ## in these loops we check if it is a region of an object or a fixture
+
+            is_obj, is_fix = False, False
+
+            for maybe_fix in self.env.fixtures_dict.keys():
+                if maybe_fix in obj1_name:
+                    is_fix = True
+                    obj1_name = maybe_fix
+                    break
+
+            
+            if not is_fix:
+                for maybe_obj in self.env.objects_dict.keys():
+                    if maybe_obj in obj1_name:
+                        is_obj = True
+                        obj1_name = maybe_obj
+                        break
+                
+            
+            if not is_obj and not is_fix:
+                raise NotImplementedError
+            
+            is_grasping = self.env._check_grasp(gripper=gripper, object_geoms=self.env.get_object(obj1_name))
+            # print("is grasping?", is_grasping)
+            ### grasping might not work with fixtures
+            ### when I ran a trajectory from the dataset
+            ### even if the robot was openning the 
+            if is_grasping:
+                reward += 1
+                if obj2_name is not None:
+                    obj1_pos = self.env.object_states_dict[obj1_name].get_geom_state()["pos"]
+                    obj2_pos = self.env.object_states_dict[obj2_name].get_geom_state()["pos"]
+                    obj_distance = np.linalg.norm(obj1_pos - obj2_pos)
+                    # print(f"distance of {obj1_name} to {obj2_name}:", obj_distance)
+
+                    reward += (1 - obj_distance)
+                else:
+                    ### for turnon, turnoff, open, close predicates need to compute need to extract joint values and compute 
+                    ### should look into articulated object functions
+                    pass
+            else:
+                distance_to_gripper = self.env._gripper_to_target(gripper=gripper, target=self.env.get_object(obj1_name), return_distance=True)
+                # print(f"distance of {obj1_name} to gripper:", distance_to_gripper)
+                reward += (1 - distance_to_gripper)
+
+            # sparse completion reward
+        if self.env._check_success():
+            reward += 1.0
+
+        # Scale reward if requested
+        if self.env.reward_scale is not None:
+            reward *= self.env.reward_scale / 1.0
+    
+        return reward
