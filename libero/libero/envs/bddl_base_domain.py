@@ -178,15 +178,73 @@ class BDDLBaseDomain(SingleArmEnv):
         """
         reward = 0.0
 
+        for state in self.parsed_problem["goal_state"]:
+            result = self._eval_predicate(state)
+            if result:
+                reward += 1.0
+                continue
+            gripper = self.robots[0].gripper    
+            
+            obj1_name = state[1]
+            obj2_name = state[2] if len(state) == 3 else None
+
+            is_obj, is_fix = False, False
+            for maybe_obj in self.objects_dict.keys():
+                if maybe_obj in obj1_name:
+                    is_obj = True
+                    obj1_name = maybe_obj
+                    break
+            
+            if not is_obj:
+                for maybe_fix in self.fixtures_dict.keys():
+                    if maybe_fix in obj1_name:
+                        is_fix = True
+                        obj1_name = maybe_fix
+            
+            if not is_obj and not is_fix:
+                raise NotImplementedError
+            
+            # predicate = state[0]
+            # mjc_body_name1 = obj1_name + "_button" if "turn" in predicate else obj1_name + "_main"
+            # mjc_geom_name1 = obj1_name + "_g"
+            # mjc_geoms1 = [self.sim.model.geom_id2name(i) for i in range(self.sim.model.ngeom) if self.sim.model.geom_id2name(i) is not None and mjc_geom_name1 in self.sim.model.geom_id2name(i)]
+
+            print(self.get_object(obj1_name).contact_geoms)
+            is_grasping = self._check_grasp(gripper=gripper, object_geoms=self.get_object(obj1_name))
+            # print("is grasping?", is_grasping)
+            ### grasping might not work with fixtures
+            ### when I ran a trajectory from the dataset
+            ### even if the robot was openning the 
+            if is_grasping:
+                reward += 1
+                if obj2_name is not None:
+                    obj1_pos = self.object_states_dict[obj1_name].get_geom_state()["pos"]
+                    obj2_pos = self.object_states_dict[obj2_name].get_geom_state()["pos"]
+                    obj_distance = np.linalg.norm(obj1_pos - obj2_pos)
+                    # print(f"distance of {obj1_name} to {obj2_name}:", obj_distance)
+
+                    reward += (1 - obj_distance)
+                else:
+                    ### for turnon, turnoff, open, close predicates need to compute need to extract joint values and compute 
+                    ### should look into articulated object functions
+                    pass
+            else:
+                distance_to_gripper = self._gripper_to_target(gripper=gripper, target=self.get_object(obj1_name), return_distance=True)
+                print(f"distance of {obj1_name} to gripper:", distance_to_gripper)
+                reward += (1 - distance_to_gripper)
+
         # sparse completion reward
         if self._check_success():
-            reward = 1.0
+            reward += 1.0
 
         # Scale reward if requested
         if self.reward_scale is not None:
             reward *= self.reward_scale / 1.0
 
         return reward
+    
+    def _eval_predicate(self, state):
+        raise NotImplementedError
 
     def _assert_problem_name(self):
         """Implement this to make sure the loaded bddl file has the correct problem name specification."""
