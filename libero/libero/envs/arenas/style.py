@@ -19,10 +19,23 @@ WALL_STYLE = {
     "ceramic": "ceramic.png",
     "white": "white_wall.png",
     "yellow-linen": "yellow_linen_wall_texture.png",
+    "red-plastic": "table_red_plastic.png",
+    "blue-plastic": "table_blue_plastic.png",
+    "green-plastic": "table_green_plastic.png"
+
 }
 
+TABLE_STYLE = {
+    "novak-wood": "martin_novak_wood_table.png",
+    "light-wood": "table_light_wood2.png",
+    "dark-wood": "table_dark_wood.png",
+    "metalic": "metalic.png",
+    "red-plastic": "table_red_plastic.png",
+    "blue-plastic": "table_blue_plastic.png",
+    "green-plastic": "table_green_plastic.png"
+}
 
-STYLE_MAPPING = {"floor": FLOOR_STYLE, "wall": WALL_STYLE}
+STYLE_MAPPING = {"floor": FLOOR_STYLE, "wall": WALL_STYLE, "table": TABLE_STYLE}
 
 
 def get_texture_filename(type, style):

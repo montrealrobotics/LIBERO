@@ -34,6 +34,7 @@ class TableArena(Arena):
         xml="arenas/table_arena.xml",
         floor_style="light-gray",
         wall_style="light-gray-plaster",
+        table_style="novak-wood",
     ):
         super().__init__(xml_path_completion(xml))
 
@@ -76,6 +77,22 @@ class TableArena(Arena):
             + [get_texture_filename(type="wall", style=wall_style)]
         )
         texwall.set("file", wall_file)
+
+        textable = self.asset.find("./texture[@name='tex-table']")
+        table_file = textable.get("file")
+        table_file = "/".join(
+            table_file.split("/")[:-1]
+            + [get_texture_filename(type="table", style=table_style)]
+        )
+        textable.set("file", table_file)
+
+        textablelegs = self.asset.find("./texture[@name='tex-table-legs']")
+        tablelegs_file = textablelegs.get("file")
+        tablelegs_file = "/".join(
+            table_file.split("/")[:-1]
+            + [get_texture_filename(type="table", style=table_style)]
+        )
+        textablelegs.set("file", tablelegs_file)
 
     def configure_location(self):
         """Configures correct locations for this arena"""

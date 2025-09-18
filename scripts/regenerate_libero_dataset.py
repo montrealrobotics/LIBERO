@@ -35,11 +35,12 @@ from libero.libero import benchmark
 
 from libero_utils import (
     get_libero_dummy_action,
-    get_libero_env,
+    # get_libero_env,
+    get_libero_seg_env,
 )
 
 
-IMAGE_RESOLUTION = 256
+IMAGE_RESOLUTION = 512 #256
 
 
 def is_noop(action, prev_action=None, threshold=1e-4):
@@ -97,7 +98,7 @@ def main(args):
     for task_id in tqdm.tqdm(range(num_tasks_in_suite)):
         # Get task in suite
         task = task_suite.get_task(task_id)
-        env, task_description = get_libero_env(task, "llava", resolution=IMAGE_RESOLUTION)
+        env, task_description = get_libero_seg_env(task, "llava", resolution=IMAGE_RESOLUTION)
 
         # Get dataset for task
         orig_data_path = os.path.join(args.libero_raw_data_dir, f"{task.name}_demo.hdf5")
@@ -131,6 +132,10 @@ def main(args):
             robot_states = []
             agentview_images = []
             eye_in_hand_images = []
+
+            agentview_segmentations = []
+            eye_in_hand_segmentations = []
+
 
             # Replay original demo actions in environment and record observations
             for _, action in enumerate(orig_actions):
@@ -171,6 +176,9 @@ def main(args):
                 agentview_images.append(obs["agentview_image"])
                 eye_in_hand_images.append(obs["robot0_eye_in_hand_image"])
 
+                agentview_segmentations.append(obs["agentview_segmentation_instance"].squeeze(-1))
+                eye_in_hand_segmentations.append(obs["robot0_eye_in_hand_segmentation_instance"].squeeze(-1))
+
                 # Execute demo action in environment
                 obs, reward, done, info = env.step(action.tolist())
 
@@ -191,6 +199,10 @@ def main(args):
                 obs_grp.create_dataset("ee_ori", data=np.stack(ee_states, axis=0)[:, 3:])
                 obs_grp.create_dataset("agentview_rgb", data=np.stack(agentview_images, axis=0))
                 obs_grp.create_dataset("eye_in_hand_rgb", data=np.stack(eye_in_hand_images, axis=0))
+
+                obs_grp.create_dataset("agentview_seg", data=np.stack(agentview_segmentations, axis=0))
+                obs_grp.create_dataset("eye_in_hand_seg", data=np.stack(eye_in_hand_segmentations, axis=0))
+
                 ep_data_grp.create_dataset("actions", data=actions)
                 ep_data_grp.create_dataset("states", data=np.stack(states))
                 ep_data_grp.create_dataset("robot_states", data=np.stack(robot_states, axis=0))
