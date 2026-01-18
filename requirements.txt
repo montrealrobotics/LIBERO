@@ -8,4 +8,5 @@
  future==0.18.2 
  matplotlib==3.5.3 
  cloudpickle==3.1.2
- gym==1.2.3
+ gym==0.25.2
+ gymnasium==1.2.3
